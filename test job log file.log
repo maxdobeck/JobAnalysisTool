@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 test job log file
-Unrelated text entry
+
 Unrelated text entry Unrelated text entryUnrelated text entry
 Unrelated text entry Unrelated text entry
 Job 1 started (AUID: 2714)
@@ -8,15 +7,5 @@ Unrelated text entry
 Unrelated text entry
 Unrelated text entry Unrelated text entry Unrelated text entry
 Job 2 started (AUID: 8165)
-=======
-test job log file
-Unrelated text entry
-Unrelated text entry Unrelated text entryUnrelated text entry
-Unrelated text entry Unrelated text entry
-Job 1 started (AUID: 2714)
-Unrelated text entry
-Unrelated text entry
-Unrelated text entry Unrelated text entry Unrelated text entry
-Job 2 started (AUID: 8165)
->>>>>>> 106f7e4013882f421f75e54de50c32fe1f03a637
+
 Job 1 completed (AUID: 2714)
