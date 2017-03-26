@@ -34,13 +34,21 @@ func makeJob(lineNumber int, logEntry string) job{
 	return newJob
 }
 
+func (thisJob job) printJobToFile(fileName string) {
+	outputFile, err := os.Create(fileName)
+	check(err)
+	defer outputFile.close()
+
+	jobInfo := fmt.Sprintf("Line# %d\n",thisJob.lineNumber)
+}
+
 func isJob(logEntry string) bool {
-	matchBool,err := regexp.MatchString("(Job \\d completed|started)", logEntry)
+	matchBool,err := regexp.MatchString("(Job)", logEntry)
 	check(err)
 	return matchBool
 }
 
-func getAllJobs(fileName string) []job{
+func getAllJobs(fileName string) []job {
 	allJobs := make([]job,0)
 	lineNumber := 0
 	logfile, err := os.Open(fileName)
