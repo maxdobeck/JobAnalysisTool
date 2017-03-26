@@ -1,3 +1,8 @@
+/* Job Analysis Tool
+** Author: Max Dobeck
+** Date: 3-25-2016
+*/
+
 package main
 
 import (
