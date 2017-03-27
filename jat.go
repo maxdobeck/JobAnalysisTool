@@ -101,7 +101,5 @@ func printUnfinishedJobs(allJobs []job, fileName string) {
 func main() {
 	jobs := getAllJobs("test job log file.log")
 	printAllJobs(jobs, "allJobs.txt")
-	
-
 	printUnfinishedJobs(jobs, "unfinishedJobs.txt")
 }
