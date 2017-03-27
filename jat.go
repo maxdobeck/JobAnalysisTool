@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"bufio"
+	"strings"
 	"regexp"
 )
 
@@ -30,16 +31,23 @@ func makeJob(lineNumber int, logEntry string) job{
 	thisJobAUID := regexp.MustCompile("((AUID:) \\d{4,9})")
 	thisJobStatus := regexp.MustCompile("completed|started")
 
-	newJob := job{lineNumber: lineNumber, jobID: thisJobID.FindString(logEntry), AUID: thisJobAUID.FindString(logEntry), status: thisJobStatus.FindString(logEntry)}
+	rawJobID := strings.Fields(thisJobID.FindString(logEntry))
+	rawJobAUID := strings.Fields(thisJobAUID.FindString(logEntry))
+
+	newJob := job{lineNumber: lineNumber, jobID: rawJobID[1], AUID: rawJobAUID[1], status: thisJobStatus.FindString(logEntry)}
+	
 	return newJob
 }
 
 func (thisJob job) printJobToFile(fileName string) {
 	outputFile, err := os.Create(fileName)
 	check(err)
-	defer outputFile.close()
+	defer outputFile.Close()
 
-	jobInfo := fmt.Sprintf("Line# %d\n",thisJob.lineNumber)
+	outputFile.WriteString(fmt.Sprintf("Line#: %d\n",thisJob.lineNumber))
+	outputFile.WriteString(fmt.Sprintf("Job ID: %s\n", thisJob.jobID))
+	outputFile.WriteString(fmt.Sprintf("AUID: %s\n", thisJob.AUID))
+	outputFile.WriteString(fmt.Sprintf("Status: %s", thisJob.status))
 }
 
 func isJob(logEntry string) bool {
@@ -71,5 +79,6 @@ func getAllJobs(fileName string) []job {
 
 func main() {
 	jobs := getAllJobs("test job log file.log")
+	jobs[0].printJobToFile("test.txt")
 	fmt.Println(jobs)
 }
