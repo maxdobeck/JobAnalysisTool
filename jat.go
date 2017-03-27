@@ -95,7 +95,6 @@ func printUnfinishedJobs(allJobs []job, fileName string) {
 		v.printJobToFile(fileName)
 	}
 	fmt.Printf("Wrote all unfinishedJobs to %s.\n", fileName)
-
 }
 
 func main() {
