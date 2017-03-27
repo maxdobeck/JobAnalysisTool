@@ -75,6 +75,13 @@ func getAllJobs(fileName string) []job {
 	return allJobs
 }
 
+func printAllJobs(allJobs []job, fileName string) {
+	for job := range allJobs {
+		allJobs[job].printJobToFile(fileName)
+	}
+	fmt.Printf("Wrote all jobs to %s.\n",fileName)
+}
+
 func printUnfinishedJobs(allJobs []job, fileName string) {
 	unfinishedJobs := make(map[string]job)
 	for i := range allJobs {
@@ -87,15 +94,14 @@ func printUnfinishedJobs(allJobs []job, fileName string) {
 	for _, v := range unfinishedJobs {
 		v.printJobToFile(fileName)
 	}
+	fmt.Printf("Wrote all unfinishedJobs to %s.\n", fileName)
+
 }
 
 func main() {
 	jobs := getAllJobs("test job log file.log")
-	for job := range jobs {
-		jobs[job].printJobToFile("allJobs.txt")
-	}
-	fmt.Println("Wrote all jobs to test.txt.")
+	printAllJobs(jobs, "allJobs.txt")
+	
 
 	printUnfinishedJobs(jobs, "unfinishedJobs.txt")
-	fmt.Println("Wrote all unfinishedJobs to unfinishedJobs.txt")
 }
