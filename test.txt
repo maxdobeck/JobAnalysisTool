@@ -1,4 +1,0 @@
-Line#: 4
-Job ID: 1
-AUID: 2714
-Status: started

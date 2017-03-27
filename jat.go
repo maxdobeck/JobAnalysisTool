@@ -20,9 +20,9 @@ func check(e error) {
 }
 
 type job struct {
-	lineNumber int
 	jobID string
 	AUID string
+	lineNumber int
 	status string
 }
 
@@ -35,19 +35,18 @@ func makeJob(lineNumber int, logEntry string) job{
 	rawJobAUID := strings.Fields(thisJobAUID.FindString(logEntry))
 
 	newJob := job{lineNumber: lineNumber, jobID: rawJobID[1], AUID: rawJobAUID[1], status: thisJobStatus.FindString(logEntry)}
-	
 	return newJob
 }
 
 func (thisJob job) printJobToFile(fileName string) {
-	outputFile, err := os.Create(fileName)
+	outputFile, err := os.OpenFile(fileName, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0666)
 	check(err)
 	defer outputFile.Close()
 
-	outputFile.WriteString(fmt.Sprintf("Line#: %d\n",thisJob.lineNumber))
 	outputFile.WriteString(fmt.Sprintf("Job ID: %s\n", thisJob.jobID))
 	outputFile.WriteString(fmt.Sprintf("AUID: %s\n", thisJob.AUID))
-	outputFile.WriteString(fmt.Sprintf("Status: %s", thisJob.status))
+	outputFile.WriteString(fmt.Sprintf("Line#: %d\n",thisJob.lineNumber))
+	outputFile.WriteString(fmt.Sprintf("Status: %s\n\n", thisJob.status))
 }
 
 func isJob(logEntry string) bool {
@@ -70,15 +69,33 @@ func getAllJobs(fileName string) []job {
 		if isJob(logEntry) {
 			thisJob := makeJob(lineNumber, logEntry)
 			allJobs = append(allJobs,thisJob)
-			//fmt.Printf("#%d %s\n",lineNumber, logEntry)
 		}
 		lineNumber++
 	}
 	return allJobs
 }
 
+func printUnfinishedJobs(allJobs []job, fileName string) {
+	unfinishedJobs := make(map[string]job)
+	for i := range allJobs {
+		if allJobs[i].status == "started"{
+			unfinishedJobs[allJobs[i].jobID] = allJobs[i]
+		} else if allJobs[i].status == "completed" {
+			delete(unfinishedJobs, allJobs[i].jobID)
+		}
+	}
+	for _, v := range unfinishedJobs {
+		v.printJobToFile(fileName)
+	}
+}
+
 func main() {
 	jobs := getAllJobs("test job log file.log")
-	jobs[0].printJobToFile("test.txt")
-	fmt.Println(jobs)
+	for job := range jobs {
+		jobs[job].printJobToFile("allJobs.txt")
+	}
+	fmt.Println("Wrote all jobs to test.txt.")
+
+	printUnfinishedJobs(jobs, "unfinishedJobs.txt")
+	fmt.Println("Wrote all unfinishedJobs to unfinishedJobs.txt")
 }
