@@ -12,6 +12,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 func check(e error) {
@@ -94,7 +95,8 @@ func getUnfinishedJobs(allJobs []job) map[string]job {
 	return unfinishedJobs
 }
 
-func printAllJobs(allJobs []job, fileName string) {
+func printSliceOfJobs(allJobs []job, fileName string) {
+	fileName = fmt.Sprintf("%s %s.txt",fileName,generateTimeStamp())
 	outputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
 	check(err)
 	defer outputFile.Close()
@@ -109,7 +111,8 @@ func printAllJobs(allJobs []job, fileName string) {
 	fmt.Printf("Wrote all all jobs to %s.\n", fileName)
 }
 
-func printUnfinishedJobs(unfinishedJobs map[string]job, fileName string) {
+func printMapOfJobs(unfinishedJobs map[string]job, fileName string) {
+	fileName = fmt.Sprintf("%s %s.txt",fileName,generateTimeStamp())
 	outputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
 	check(err)
 	defer outputFile.Close()
@@ -124,9 +127,15 @@ func printUnfinishedJobs(unfinishedJobs map[string]job, fileName string) {
 	fmt.Printf("Wrote all unfinishedJobs to %s.\n", fileName)
 }
 
+func generateTimeStamp () string {
+	now := time.Now()
+	localTimeStamp := fmt.Sprintf("%d-%d-%d %d", now.Month(), now.Day(), now.Year(), now.Nanosecond())
+	return localTimeStamp
+}
+
 func main() {
 	allJobs := getAllJobs("tests/testSmallBasic.log")
-	printAllJobs(allJobs, "output/allJobs.txt")
+	printSliceOfJobs(allJobs, "output/allJobs")
 	unfinishedJobs := getUnfinishedJobs(allJobs)
-	printUnfinishedJobs(unfinishedJobs, "output/unfinishedJobs.txt")
+	printMapOfJobs(unfinishedJobs, "output/unfinishedJobs")
 }
