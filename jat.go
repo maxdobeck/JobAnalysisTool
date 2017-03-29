@@ -83,11 +83,12 @@ func getAllJobs(fileName string) []job {
 
 func getUnfinishedJobs(allJobs []job) map[string]job {
 	unfinishedJobs := make(map[string]job)
-	for i := range allJobs {
-		if allJobs[i].status == "started" {
-			unfinishedJobs[allJobs[i].jobID] = allJobs[i]
-		} else if allJobs[i].status == "completed" {
-			delete(unfinishedJobs, allJobs[i].jobID)
+	for job := range allJobs {
+		curJob := allJobs[job]
+		if curJob.status == "started" {
+			unfinishedJobs[curJob.jobID] = curJob
+		} else if curJob.status == "completed" {
+			delete(unfinishedJobs, curJob.jobID)
 		}
 	}
 	return unfinishedJobs
