@@ -1,32 +1,33 @@
 /* Job Analysis Tool
 ** Author: Max Dobeck
 ** Date: 3-25-2016
-*/
+ */
 
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
-	"bufio"
-	"strings"
 	"regexp"
+	"strings"
+	"log"
 )
 
 func check(e error) {
 	if e != nil {
-		panic(e)
+		log.Fatal(e)
 	}
 }
 
 type job struct {
-	jobID string
-	AUID string
+	jobID      string
+	AUID       string
 	lineNumber int
-	status string
+	status     string
 }
 
-func makeJob(lineNumber int, logEntry string) job{
+func makeJob(lineNumber int, logEntry string) job {
 	thisJobID := regexp.MustCompile("(Job \\d)")
 	thisJobAUID := regexp.MustCompile("((AUID:) \\d{4,9})")
 	thisJobStatus := regexp.MustCompile("completed|started")
@@ -34,7 +35,11 @@ func makeJob(lineNumber int, logEntry string) job{
 	rawJobID := strings.Fields(thisJobID.FindString(logEntry))
 	rawJobAUID := strings.Fields(thisJobAUID.FindString(logEntry))
 
-	newJob := job{lineNumber: lineNumber, jobID: rawJobID[1], AUID: rawJobAUID[1], status: thisJobStatus.FindString(logEntry)}
+	var newJob job
+	newJob.lineNumber = lineNumber 
+	newJob.jobID = rawJobID[1]
+	newJob.AUID = rawJobAUID[1]
+	newJob.status = thisJobStatus.FindString(logEntry)
 	return newJob
 }
 
@@ -43,32 +48,33 @@ func (thisJob job) printJobToFile(fileName string) {
 	check(err)
 	defer outputFile.Close()
 
-	outputFile.WriteString(fmt.Sprintf("Job ID: %s\n", thisJob.jobID))
-	outputFile.WriteString(fmt.Sprintf("AUID: %s\n", thisJob.AUID))
-	outputFile.WriteString(fmt.Sprintf("Line#: %d\n",thisJob.lineNumber))
-	outputFile.WriteString(fmt.Sprintf("Status: %s\n\n", thisJob.status))
+	outputFile.WriteString(fmt.Sprintf("Job ID: %s\r\n", thisJob.jobID))
+	outputFile.WriteString(fmt.Sprintf("AUID: %s\r\n", thisJob.AUID))
+	outputFile.WriteString(fmt.Sprintf("Line#: %d\r\n", thisJob.lineNumber))
+	outputFile.WriteString(fmt.Sprintf("Status: %s\r\n", thisJob.status))
+	outputFile.WriteString(fmt.Sprintf("\r\n\r\n"))
 }
 
 func isJob(logEntry string) bool {
-	matchBool,err := regexp.MatchString("(Job)", logEntry)
+	matchBool, err := regexp.MatchString("(Job)", logEntry)
 	check(err)
 	return matchBool
 }
 
 func getAllJobs(fileName string) []job {
-	allJobs := make([]job,0)
+	allJobs := make([]job, 0)
 	lineNumber := 0
 	logfile, err := os.Open(fileName)
 	check(err)
 	defer logfile.Close()
 
 	scanner := bufio.NewScanner(logfile)
-	
+
 	for scanner.Scan() {
 		logEntry := scanner.Text()
 		if isJob(logEntry) {
 			thisJob := makeJob(lineNumber, logEntry)
-			allJobs = append(allJobs,thisJob)
+			allJobs = append(allJobs, thisJob)
 		}
 		lineNumber++
 	}
@@ -79,13 +85,13 @@ func printAllJobs(allJobs []job, fileName string) {
 	for job := range allJobs {
 		allJobs[job].printJobToFile(fileName)
 	}
-	fmt.Printf("Wrote all jobs to %s.\n",fileName)
+	fmt.Printf("Wrote all jobs to %s.\n", fileName)
 }
 
 func printUnfinishedJobs(allJobs []job, fileName string) {
 	unfinishedJobs := make(map[string]job)
 	for i := range allJobs {
-		if allJobs[i].status == "started"{
+		if allJobs[i].status == "started" {
 			unfinishedJobs[allJobs[i].jobID] = allJobs[i]
 		} else if allJobs[i].status == "completed" {
 			delete(unfinishedJobs, allJobs[i].jobID)
@@ -99,6 +105,6 @@ func printUnfinishedJobs(allJobs []job, fileName string) {
 
 func main() {
 	jobs := getAllJobs("test job log file.log")
-	printAllJobs(jobs, "allJobs.txt")
-	printUnfinishedJobs(jobs, "unfinishedJobs.txt")
+	printAllJobs(jobs, "output/allJobs.txt")
+	printUnfinishedJobs(jobs, "output/unfinishedJobs.txt")
 }

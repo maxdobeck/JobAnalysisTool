@@ -13,18 +13,3 @@ AUID: 2714
 Line#: 10
 Status: completed
 
-Job ID: 1
-AUID: 2714
-Line#: 4
-Status: started
-
-Job ID: 2
-AUID: 8165
-Line#: 8
-Status: started
-
-Job ID: 1
-AUID: 2714
-Line#: 10
-Status: completed
-
