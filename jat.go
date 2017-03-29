@@ -8,10 +8,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strings"
-	"log"
 )
 
 func check(e error) {
@@ -36,7 +36,7 @@ func makeJob(lineNumber int, logEntry string) job {
 	rawJobAUID := strings.Fields(thisJobAUID.FindString(logEntry))
 
 	var newJob job
-	newJob.lineNumber = lineNumber 
+	newJob.lineNumber = lineNumber
 	newJob.jobID = rawJobID[1]
 	newJob.AUID = rawJobAUID[1]
 	newJob.status = thisJobStatus.FindString(logEntry)
@@ -82,8 +82,16 @@ func getAllJobs(fileName string) []job {
 }
 
 func printAllJobs(allJobs []job, fileName string) {
+	outputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
+	check(err)
+	defer outputFile.Close()
+
 	for job := range allJobs {
-		allJobs[job].printJobToFile(fileName)
+		outputFile.WriteString(fmt.Sprintf("Job ID: %s\r\n", allJobs[job].jobID))
+		outputFile.WriteString(fmt.Sprintf("AUID: %s\r\n", allJobs[job].AUID))
+		outputFile.WriteString(fmt.Sprintf("Line#: %d\r\n", allJobs[job].lineNumber))
+		outputFile.WriteString(fmt.Sprintf("Status: %s\r\n", allJobs[job].status))
+		outputFile.WriteString(fmt.Sprintf("\r\n\r\n"))
 	}
 	fmt.Printf("Wrote all jobs to %s.\n", fileName)
 }
@@ -97,14 +105,23 @@ func printUnfinishedJobs(allJobs []job, fileName string) {
 			delete(unfinishedJobs, allJobs[i].jobID)
 		}
 	}
+
+	unfinishedJobOutputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
+	check(err)
+	defer unfinishedJobOutputFile.Close()
+
 	for _, v := range unfinishedJobs {
-		v.printJobToFile(fileName)
+		unfinishedJobOutputFile.WriteString(fmt.Sprintf("Job ID: %s\r\n", v.jobID))
+		unfinishedJobOutputFile.WriteString(fmt.Sprintf("AUID: %s\r\n", v.AUID))
+		unfinishedJobOutputFile.WriteString(fmt.Sprintf("Line#: %d\r\n", v.lineNumber))
+		unfinishedJobOutputFile.WriteString(fmt.Sprintf("Status: %s\r\n", v.status))
+		unfinishedJobOutputFile.WriteString(fmt.Sprintf("\r\n\r\n"))
 	}
 	fmt.Printf("Wrote all unfinishedJobs to %s.\n", fileName)
 }
 
 func main() {
-	jobs := getAllJobs("test job log file.log")
+	jobs := getAllJobs("tests/testSmallBasic.log")
 	printAllJobs(jobs, "output/allJobs.txt")
 	printUnfinishedJobs(jobs, "output/unfinishedJobs.txt")
 }
