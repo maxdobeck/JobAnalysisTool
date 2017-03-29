@@ -20,10 +20,6 @@ func check(e error) {
 	}
 }
 
-/*type jobsInterface interface {
-
-}*/
-
 type job struct {
 	jobID      string
 	AUID       string
@@ -56,7 +52,7 @@ func (thisJob job) printJobToFile(fileName string) {
 	outputFile.WriteString(fmt.Sprintf("AUID: %s\r\n", thisJob.AUID))
 	outputFile.WriteString(fmt.Sprintf("Line#: %d\r\n", thisJob.lineNumber))
 	outputFile.WriteString(fmt.Sprintf("Status: %s\r\n", thisJob.status))
-	outputFile.WriteString(fmt.Sprintf("\r\n\r\n"))
+	outputFile.WriteString(fmt.Sprintf("\r\n"))
 }
 
 func isJob(logEntry string) bool {
@@ -107,33 +103,25 @@ func printAllJobs(allJobs []job, fileName string) {
 		outputFile.WriteString(fmt.Sprintf("AUID: %s\r\n", allJobs[job].AUID))
 		outputFile.WriteString(fmt.Sprintf("Line#: %d\r\n", allJobs[job].lineNumber))
 		outputFile.WriteString(fmt.Sprintf("Status: %s\r\n", allJobs[job].status))
-		outputFile.WriteString(fmt.Sprintf("\r\n\r\n"))
+		outputFile.WriteString(fmt.Sprintf("\r\n"))
 	}
-	fmt.Printf("Wrote all jobs to %s.\n", fileName)
+	fmt.Printf("Wrote all all jobs to %s.\n", fileName)
 }
-/*
+
 func printUnfinishedJobs(unfinishedJobs map[string]job, fileName string) {
-	unfinishedJobs := make(map[string]job)
-	for i := range allJobs {
-		if allJobs[i].status == "started" {
-			unfinishedJobs[allJobs[i].jobID] = allJobs[i]
-		} else if allJobs[i].status == "completed" {
-			delete(unfinishedJobs, allJobs[i].jobID)
-		}
-	}
-		unfinishedJobOutputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
+	outputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
 	check(err)
-	defer unfinishedJobOutputFile.Close()
+	defer outputFile.Close()
 
 	for _, v := range unfinishedJobs {
-		unfinishedJobOutputFile.WriteString(fmt.Sprintf("Job ID: %s\r\n", v.jobID))
-		unfinishedJobOutputFile.WriteString(fmt.Sprintf("AUID: %s\r\n", v.AUID))
-		unfinishedJobOutputFile.WriteString(fmt.Sprintf("Line#: %d\r\n", v.lineNumber))
-		unfinishedJobOutputFile.WriteString(fmt.Sprintf("Status: %s\r\n", v.status))
-		unfinishedJobOutputFile.WriteString(fmt.Sprintf("\r\n\r\n"))
+		outputFile.WriteString(fmt.Sprintf("Job ID: %s\r\n", v.jobID))
+		outputFile.WriteString(fmt.Sprintf("AUID: %s\r\n", v.AUID))
+		outputFile.WriteString(fmt.Sprintf("Line#: %d\r\n", v.lineNumber))
+		outputFile.WriteString(fmt.Sprintf("Status: %s\r\n", v.status))
+		outputFile.WriteString(fmt.Sprintf("\r\n"))
 	}
 	fmt.Printf("Wrote all unfinishedJobs to %s.\n", fileName)
-}*/
+}
 
 func main() {
 	allJobs := getAllJobs("tests/testSmallBasic.log")
