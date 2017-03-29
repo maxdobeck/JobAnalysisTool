@@ -20,6 +20,10 @@ func check(e error) {
 	}
 }
 
+/*type jobsInterface interface {
+
+}*/
+
 type job struct {
 	jobID      string
 	AUID       string
@@ -81,6 +85,18 @@ func getAllJobs(fileName string) []job {
 	return allJobs
 }
 
+func getUnfinishedJobs(allJobs []job) map[string]job {
+	unfinishedJobs := make(map[string]job)
+	for i := range allJobs {
+		if allJobs[i].status == "started" {
+			unfinishedJobs[allJobs[i].jobID] = allJobs[i]
+		} else if allJobs[i].status == "completed" {
+			delete(unfinishedJobs, allJobs[i].jobID)
+		}
+	}
+	return unfinishedJobs
+}
+
 func printAllJobs(allJobs []job, fileName string) {
 	outputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
 	check(err)
@@ -95,8 +111,8 @@ func printAllJobs(allJobs []job, fileName string) {
 	}
 	fmt.Printf("Wrote all jobs to %s.\n", fileName)
 }
-
-func printUnfinishedJobs(allJobs []job, fileName string) {
+/*
+func printUnfinishedJobs(unfinishedJobs map[string]job, fileName string) {
 	unfinishedJobs := make(map[string]job)
 	for i := range allJobs {
 		if allJobs[i].status == "started" {
@@ -105,8 +121,7 @@ func printUnfinishedJobs(allJobs []job, fileName string) {
 			delete(unfinishedJobs, allJobs[i].jobID)
 		}
 	}
-
-	unfinishedJobOutputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
+		unfinishedJobOutputFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0666)
 	check(err)
 	defer unfinishedJobOutputFile.Close()
 
@@ -118,10 +133,11 @@ func printUnfinishedJobs(allJobs []job, fileName string) {
 		unfinishedJobOutputFile.WriteString(fmt.Sprintf("\r\n\r\n"))
 	}
 	fmt.Printf("Wrote all unfinishedJobs to %s.\n", fileName)
-}
+}*/
 
 func main() {
-	jobs := getAllJobs("tests/testSmallBasic.log")
-	printAllJobs(jobs, "output/allJobs.txt")
-	printUnfinishedJobs(jobs, "output/unfinishedJobs.txt")
+	allJobs := getAllJobs("tests/testSmallBasic.log")
+	printAllJobs(allJobs, "output/allJobs.txt")
+	unfinishedJobs := getUnfinishedJobs(allJobs)
+	printUnfinishedJobs(unfinishedJobs, "output/unfinishedJobs.txt")
 }
